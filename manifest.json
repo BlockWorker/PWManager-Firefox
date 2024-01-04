@@ -1,0 +1,97 @@
+{
+
+  "manifest_version": 2,
+  "name": "PWManager",
+  "version": "1.1.0",
+
+  "description": "__MSG_extensionDescription__",
+  
+  "default_locale": "en",
+
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "pwm-ff2@blockworker.de"
+    }
+  },
+  
+  "permissions": [
+    "storage"
+  ],
+
+  "icons": {
+    "24": "icons/dark-24.png",
+    "48": "icons/dark-48.png",
+    "96": "icons/dark-96.png"
+  },
+  
+  "content_scripts": [
+    {
+      "matches": ["https://*/*"],
+      "js": ["browser-polyfill.min.js", "pwm-core.js", "content/pwm-content.js"],
+      "css": ["content/pwm-content.css"]
+    }
+  ],
+  
+  "background": {
+    "scripts": [
+      "browser-polyfill.min.js",
+      "pwm-background.js"
+    ]
+  },
+  
+  "options_ui": {
+    "page": "options/options.html",
+    "browser_style": true
+  },
+  
+  "browser_action": {
+    "browser_style": true,
+    "default_icon": {
+      "24": "icons/dark-24.png",
+      "48": "icons/dark-48.png",
+      "96": "icons/dark-96.png"
+    },
+    "default_title": "PWManager",
+    "theme_icons": [{
+      "dark": "icons/light-24.png",
+      "light": "icons/dark-24.png",
+      "size": 24
+    }, {
+      "dark": "icons/light-48.png",
+      "light": "icons/dark-48.png",
+      "size": 48
+    }, {
+      "dark": "icons/light-96.png",
+      "light": "icons/dark-96.png",
+      "size": 96
+    }]
+  },
+  
+  "commands": {
+    "pwm-main": {
+      "suggested_key": {
+        "default": "Ctrl+Up"
+      },
+      "description": "__MSG_commandMain__"
+    },
+    "pwm-custom": {
+      "suggested_key": {
+        "default": "Ctrl+Left"
+      },
+      "description": "__MSG_commandCustom__"
+    },
+    "pwm-subdomain": {
+      "suggested_key": {
+        "default": "Ctrl+Down"
+      },
+      "description": "__MSG_commandSubdomain__"
+    },
+    "pwm-length": {
+      "suggested_key": {
+        "default": "Ctrl+Right"
+      },
+      "description": "__MSG_commandLength__"
+    }
+  }
+
+}

@@ -1,0 +1,57 @@
+{
+  "extensionDescription": {
+    "message": "Einfaches Passwortgenerator-Add-On."
+  },
+  
+  "commandMain": {
+    "message": "PWManager-Popup öffnen oder Passwort erzeugen"
+  },
+  
+  "commandCustom": {
+    "message": "Passwortadresse ändern"
+  },
+  
+  "commandSubdomain": {
+    "message": "Subdomain-basierte Adresse umschalten"
+  },
+  
+  "commandLength": {
+    "message": "Passwortlänge umschalten"
+  },
+  
+  "master": {
+    "message": "Master"
+  },
+  
+  "ident": {
+    "message": "Adresse"
+  },
+  
+  "symbols": {
+    "message": "Zeichen"
+  },
+  
+  "iter": {
+    "message": "Iteration"
+  },
+  
+  "long": {
+    "message": "Lang"
+  },
+  
+  "all": {
+    "message": "Alle"
+  },
+  
+  "generate": {
+    "message": "Erzeugen"
+  },
+  
+  "copiedMessage": {
+    "message": "Kopiert!"
+  },
+  
+  "save": {
+    "message": "Speichern"
+  }
+}

@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+  <head>
+
+    <meta charset="utf-8"/>
+    <link rel="stylesheet" href="genpage.css">
+    <title>PWManager</title>
+
+  </head>
+  <body>
+
+    <form id="form">
+      <table>
+        <tr>
+          <td colspan="2">
+            <label class="title">PWManager</label>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <label id="masterlabel" for="master">Master:</label>
+          </td>
+          <td>
+            <input type="password" id="master" name="pwm_master" class="pwm-ignore">
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <label id="identlabel" for="ident">Identifier:</label>
+          </td>
+          <td>
+            <input type="text" id="ident" name="pwm_ident">
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <label id="iterlabel" for="iter">Iteration:</label>
+          </td>
+          <td>
+            <input type="number" id="iter" name="pwm_iter" value="0" min="0">
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <label id="symbollabel" for="symbols">Symbols:</label>
+          </td>
+          <td>
+            <input type="text" id="symbols" name="pwm_symbols" style="width: 300px">
+            <button type="button" id="allsymbols" style="width: 40px; margin-left: 0.4em">All</button>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <input type="checkbox" id="long" name="pwm_long" style="width:15px;" checked>
+            <label id="longlabel" for="long" style="width:35px;text-align:left">Long</label>
+          </td>
+          <td>
+            <button type="button" id="generate">Generate</button>
+            <label id="copymsg" class="copymsg">Copied to clipboard!</label>
+          </td>
+        </tr>
+      </table>
+    </form>
+
+    <input type="hidden" id="result" readonly>
+
+    <script src="../browser-polyfill.min.js"></script>
+    <script src="../pwm-core.js"></script>
+    <script src="genpage.js"></script>
+
+  </body>
+</html>

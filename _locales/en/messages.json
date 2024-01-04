@@ -1,0 +1,57 @@
+{
+  "extensionDescription": {
+    "message": "Simple password generator add-on."
+  },
+  
+  "commandMain": {
+    "message": "Open the PWManager popup or generate password"
+  },
+  
+  "commandCustom": {
+    "message": "Change password identifier"
+  },
+  
+  "commandSubdomain": {
+    "message": "Toggle subdomain-based identifier"
+  },
+  
+  "commandLength": {
+    "message": "Toggle password length"
+  },
+  
+  "master": {
+    "message": "Master"
+  },
+  
+  "ident": {
+    "message": "Identifier"
+  },
+  
+  "symbols": {
+    "message": "Symbols"
+  },
+  
+  "iter": {
+    "message": "Iteration"
+  },
+  
+  "long": {
+    "message": "Long"
+  },
+  
+  "all": {
+    "message": "All"
+  },
+  
+  "generate": {
+    "message": "Generate"
+  },
+  
+  "copiedMessage": {
+    "message": "Copied to clipboard!"
+  },
+  
+  "save": {
+    "message": "Save"
+  }
+}
