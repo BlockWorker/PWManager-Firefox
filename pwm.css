@@ -1,0 +1,332 @@
+:root {
+  --bg-dark: #080808;
+  --bg-dim: #141414;
+  --bg-mid: #222;
+  --bg-bright: #282828;
+  --theme-dark: #228;
+  --theme-active: #44f;
+  --theme-pale: #77e;
+  --theme-hover-dark: #112;
+  --theme-hover-mid: #338;
+  --theme-hover-bright: #88f;
+  --inactive: #383838;
+  --inactive-hover: #444;
+  --error-dark: #822;
+  --error-active: #f44;
+  --error-pale: #e77;
+  --error-hover-dark: #211;
+  --error-hover-mid: #833;
+  --inline-icon: #aaa;
+  --disabled-bg: #333;
+  --disabled-fg: #555;
+}
+
+html {
+  height: 100%;
+  margin: auto;
+  overflow: scroll;
+  display: flex;
+}
+
+body {
+  flex-grow: 1;
+  margin: 0 20px 0 20px;
+  padding: 0;
+  background-color: var(--bg-mid);
+  display: flex;
+}
+
+.column-layout {
+  margin: auto;
+  width: auto;
+  flex-grow: 1;
+}
+
+.flex-fixed {
+  width: auto;
+  height: auto;
+  flex-shrink: 0;
+  flex-grow: 0;
+}
+
+.vert-auto {
+  margin-top: auto;
+  margin-bottom: auto;
+}
+
+.divider {
+  background-color: var(--inactive);
+  padding: 0
+}
+
+.flex-item {
+  margin: 40px auto 40px auto;
+  padding: 11px 15px 11px 15px;
+  border: 2px solid var(--theme-dark);
+  border-radius: 15px;
+  background-color: var(--bg-dim);
+  display: flex;
+}
+
+.flex-item, table, tbody, tr, td, .input-wrapper, input {
+  flex-grow: 1;
+  min-width: 1px;
+}
+
+td + td {
+  margin-left: 5px;
+}
+
+a {
+  text-decoration: none;
+}
+
+a.extensionlink {
+  display: inline-block;
+  margin: 0;
+  color: white;
+  font: 24px sans-serif;
+  text-align: center;
+  background-color: var(--bg-dark);
+  box-sizing: border-box;
+  line-height: 8px;
+  width: 100%;
+  padding: 3px;
+  border: 2px solid var(--theme-dark);
+  border-radius: 8px;
+  transition: .25s background-color;
+}
+
+a.extensionlink span {
+  display: inline-block;
+  width: 100%;
+  line-height: normal;
+}
+
+.small {
+  font: 12px sans-serif;
+}
+
+a:hover {
+  background-color: var(--theme-hover-dark);
+}
+
+a:active {
+  background-color: var(--theme-active);
+}
+
+table, tr {
+  display: flex;
+  width: 100%;
+  padding: 0;
+  margin: 0;
+}
+
+td {
+  display: flex;
+  width: 100%;
+  margin-top: 4px;
+  margin-bottom: 4px;
+}
+
+.msg, .errormsg, .table-leftside, .table-rightside {
+  font: 16px sans-serif;
+  width: 100%;
+  text-align: center;
+}
+
+.msg, .table-leftside, .table-rightside {
+  color: white;
+}
+
+.errormsg {
+  color: var(--error-pale);
+}
+
+.table-leftside {
+  text-align: end;
+}
+
+.table-rightside {
+  text-align: start;
+}
+
+.title {
+  font: 21px sans-serif;
+  color: var(--theme-pale);
+  width: 100%;
+  margin: 0 auto;
+  text-align: center;
+  margin-bottom: 3px;
+}
+
+.input-wrapper {
+  background-color: var(--bg-dark);
+
+  width: 100%;
+  box-sizing: border-box;
+  position: relative;
+  display: flex;
+
+  padding: 11px;
+  border: 1px solid var(--theme-dark);
+  border-radius: 8px;
+  
+  outline: 2px solid transparent;
+  
+  transition: .3s background-color;
+  transition: .3s outline-color;
+  transition: .3s border-color;
+}
+
+.input-error {
+  border-color: var(--error-dark);
+}
+
+.input-wrapper:hover {
+  background-color: var(--theme-hover-dark);
+}
+
+.input-error:hover {
+  background-color: var(--error-hover-dark);
+}
+
+.input-wrapper:focus-within {
+  outline-color: var(--theme-active);
+  border-color: transparent;
+}
+
+.input-error:focus-within {
+  outline-color: var(--error-active);
+}
+
+.inline-icon {
+  color: var(--inline-icon);
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+
+.icon-spacer {
+  width: 24px;
+  margin-right: 5px;
+  flex-shrink: 0;
+}
+
+input {
+  font: 16px sans-serif;
+  color: white;
+  background-color: transparent;
+  border: none;
+  outline: none;
+  line-height: 24px;
+  min-width: 1px;
+}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type=number] {
+  -moz-appearance: textfield;
+}
+
+button.filled-button, button.filled-icon-button, button.delete-button {
+  color: white;
+  font-weight: bold;
+  background-color: var(--theme-dark);
+  box-sizing: border-box;
+  padding: 11px;  
+  border: none;
+  border-radius: 9999px;
+  transition: .25s background-color;
+}
+
+button.filled-icon-button, button.delete-button {
+  padding: 4px;
+  font-weight: normal
+}
+
+button.delete-button {
+  background-color: var(--error-dark);
+}
+
+button.filled-button-inactive {
+  color: var(--theme-pale);
+  background-color: var(--inactive);
+}
+
+button.delete-button-inactive {
+  color: var(--error-pale);
+  background-color: var(--inactive);
+}
+
+.icon-button {
+  color: var(--inline-icon);
+  border: none;
+  box-sizing: border-box;
+  background-color: transparent;
+  display: inline-block;
+  transition: .25s color;
+}
+
+button.filled-button:hover, button.filled-icon-button:hover {
+  background-color: var(--theme-hover-mid);
+}
+
+button.delete-button:hover {
+  background-color: var(--error-hover-mid);
+}
+
+button.filled-button-inactive:hover, button.delete-button-inactive:hover {
+  background-color: var(--inactive-hover);
+}
+
+.icon-button:hover, .inline-icon.highlight {
+  color: var(--theme-hover-bright);
+}
+
+button.filled-button:active, button.filled-icon-button:active {
+  background-color: var(--theme-active);
+}
+
+button.delete-button:active {
+  background-color: var(--error-active);
+}
+
+.icon-button:active {
+  color: var(--theme-active);
+}
+
+button.disabled, button.disabled:focus, button.disabled:active {
+  background-color: var(--disabled-bg);
+  color: var(--disabled-fg);
+  pointer-events: none;
+}
+
+.tooltip {
+  all: revert;
+  visibility: hidden;
+  position: absolute;
+  transform: translate(-50%, -50%);
+  z-index: 1;
+  color: white;
+  font: 12px sans-serif;
+  background-color: var(--bg-bright);
+  border-radius: 10px;
+  border: 1px solid var(--theme-dark);
+  padding: 8px;
+  opacity: 0;
+  transition: 0.2s opacity;
+  transition-delay: 1s;
+  white-space: nowrap;
+}
+
+.tooltip-container:hover .tooltip {
+  visibility: visible;
+  opacity: 1;
+  transition-delay: 0
+}

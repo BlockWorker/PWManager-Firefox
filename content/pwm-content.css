@@ -1,3 +1,15 @@
+iframe.pwm-iframe {
+  all: revert;
+  z-index: 9999;
+  position: absolute;
+  display: block;
+  background: transparent;
+  border: none;
+  width: 400px;
+  height: 330px;
+  overflow: hidden;
+}
+
 div.pwm-popup {
   all: revert;
   position: fixed;

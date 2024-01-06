@@ -1,30 +1,177 @@
 <!DOCTYPE html>
-
 <html>
   <head>
-    <meta charset="utf-8"/>
-    <link rel="stylesheet" href="chrome://global/skin/in-content/common.css">
-    <link rel="stylesheet" href="options.css">
-  </head>
 
+    <meta charset="utf-8"/>
+    <link rel="stylesheet" href="../pwm.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <title>PWManager Settings</title>
+
+  </head>
   <body>
-    <div id="container">
-      <table id="table">
-        <tr>
-          <th id="identheader" style="width: 37%">Identifier</th>
-          <th id="iterheader" style="width: 15%">Iteration</th>
-          <th id="symbolheader">Symbols</th>
-          <th style="width: 50px; min-width: 50px">
-        </tr>
-      </table>
-      <button type="button" id="add">+</button>
-      <hr>
-      <button type="button" id="save">Save</button>
+
+    <div class="column-layout" style="min-width: 580px; max-width: 1100px">
+      <div class="flex-item">
+        <table><tbody id="table">
+          <tr><td>
+            <label class="title">Identifier Settings</label>
+          </td></tr>
+          <tr id="error-row" style="display: none"><td>
+            <label class="errormsg">Error: Local storage not available, settings disabled</label>
+          </td></tr>
+          <tr id="template-row" style="display: none">
+            <td>
+              <span class="input-wrapper input-error">
+                <span class="icon-spacer">
+                  <span class="material-icons inline-icon">link</span>
+                </span>
+                <input type="text" placeholder="Identifier">
+              </span>
+            </td>
+            <td style="flex-shrink: 1.3">
+              <span class="input-wrapper">
+                <span class="icon-spacer">
+                  <span class="material-icons inline-icon">tag</span>
+                </span>
+                <input type="number" value="0" min="0" placeholder="Iteration">
+              </span>
+            </td>
+            <td>
+              <span class="input-wrapper">
+                <span class="icon-spacer">
+                  <span class="material-icons inline-icon">emoji_symbols</span>
+                </span>
+                <input type="text" placeholder="Symbols">
+                <span class="icon-spacer">
+                  <span class="inline-icon" style="padding-top: 4px; pointer-events: auto">
+                    <button type="button" class="material-icons icon-button">all_inclusive</button>
+                  </span>
+                </span>
+              </span>
+            </td>
+            <td class="flex-fixed vert-auto">
+              <button type="button" class="material-icons filled-icon-button">text_increase</button>
+            </td>
+            <td class="flex-fixed vert-auto divider" style="height: 40px"/>
+            <td class="flex-fixed vert-auto">
+              <button type="button" class="material-icons delete-button delete-button-inactive">delete</button>
+            </td>
+          </tr>
+          <tr id="end-divider">
+            <td class="flex-fixed divider" style="width: 100%; height: 1px" />
+          </tr>
+          <tr>
+            <td class="flex-fixed">
+              <button type="button" id="clear-button" class="material-icons delete-button disabled">delete_forever</button>
+            </td>
+            <td />
+            <td class="flex-fixed">
+              <button type="button" id="add-button" class="material-icons filled-icon-button disabled">add</button>
+            </td>
+            <td class="flex-fixed">
+              <button type="button" id="save-button" class="material-icons filled-icon-button disabled">save</button>
+            </td>
+          </tr>
+        </tbody></table>
+      </div>
+      
+      <div class="flex-item" style="min-width: 200px; max-width: 500px">
+        <table id="sync-control"><tbody>
+          <tr><td>
+            <label class="title">Sync Settings</label>
+          </td></tr>
+          <tr>
+            <td><span class="table-leftside">Server Host:</span></td>
+            <td><span id="sync-host-disp" class="table-rightside">(None)</span></td>
+          </tr>
+          <tr>
+            <td><span class="table-leftside">Server Port:</span></td>
+            <td><span id="sync-port-disp" class="table-rightside">(None)</span></td>
+          </tr>
+          <tr>
+            <td><span class="table-leftside">Token:</span></td>
+            <td><span id="sync-token-disp" class="table-rightside">(None)</span></td>
+          </tr>
+          <tr id="end-divider">
+            <td class="flex-fixed divider" style="width: 100%; height: 1px" />
+          </tr>
+          <tr>
+            <td class="flex-fixed">
+              <button type="button" id="sync-edit-button" class="material-icons filled-icon-button disabled">edit</button>
+            </td>
+            <td>
+              <span class="table-leftside vert-auto">Last Sync:</span>
+            </td>
+            <td>
+              <span id="sync-status" class="table-rightside vert-auto">Never</span>
+            </td>
+            <td class="flex-fixed">
+              <button type="button" id="sync-button" class="material-icons filled-icon-button disabled">sync</button>
+            </td>
+          </tr>
+        </tbody></table>
+        <table id="sync-settings" style="display: none"><tbody>
+          <tr><td>
+            <label class="title">Sync Settings</label>
+          </td></tr>
+          <tr><td>
+            <span id="sync-host-wrapper" class="input-wrapper input-error">
+              <span class="icon-spacer">
+                <span class="material-icons inline-icon">dns</span>
+              </span>
+              <input id="sync-host-box" type="text" placeholder="Server Host">
+            </span>
+          </td></tr>
+          <tr><td>
+            <span id="sync-port-wrapper" class="input-wrapper input-error">
+              <span class="icon-spacer">
+                <span class="material-icons inline-icon">lan</span>
+              </span>
+              <input id="sync-port-box" type="number" value="" min="1" placeholder="Server Port">
+            </span>
+          </td></tr>
+          <tr><td>
+            <span id="sync-token-wrapper" class="input-wrapper input-error">
+              <span class="icon-spacer">
+                <span class="material-icons inline-icon">person</span>
+              </span>
+              <input id="sync-token-box" type="text" placeholder="Token">
+              <span class="icon-spacer" style="margin: 0">
+                <span class="tooltip-container inline-icon " style="padding-top: 4px; pointer-events: auto">
+                  <span class="material-icons">info</span>
+                  <div class="tooltip" style="top: 75px; left: 15px">
+                    A unique token that identifies you as a user.<br/>
+                    DO NOT USE YOUR PASSWORD!<br/>
+                    For example, use a random combination of words.<br/>
+                    Don't share it, anyone who knows it can mess up your settings.
+                  </div>
+                </span>
+              </span>
+            </span>
+          </td></tr>
+          <tr>
+            <td class="flex-fixed divider" style="width: 100%; height: 1px" />
+          </tr>
+          <tr>
+            <td class="flex-fixed">
+              <button type="button" id="sync-delete-button" class="material-icons delete-button disabled">delete_forever</button>
+            </td>
+            <td>
+              <span id="sync-testing" class="msg vert-auto"></span>
+            </td>
+            <td class="flex-fixed">
+              <button type="button" id="sync-cancel-button" class="material-icons filled-icon-button">cancel</button>
+            </td>
+            <td class="flex-fixed">
+              <button type="button" id="sync-save-button" class="material-icons filled-icon-button disabled">save</button>
+            </td>
+          </tr>
+        </tbody></table>
+      </div>
     </div>
-    
-    <script src="../browser-polyfill.min.js"></script>
+
     <script src="../pwm-core.js"></script>
     <script src="options.js"></script>
-    
+
   </body>
 </html>

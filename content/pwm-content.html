@@ -1,29 +1,35 @@
 <!DOCTYPE html>
-<html>
+<html style="width: 400px; height: 330px; overflow: hidden; background-color: transparent">
   <head>
 
     <meta charset="utf-8"/>
     <link rel="stylesheet" href="../pwm.css">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-    <title>PWManager</title>
+    <style>
+      td {
+        margin-top: 2px;
+        margin-bottom: 2px;
+      }
+      
+      .input-wrapper {
+        padding: 4px;
+      }
+      
+      button.filled-button {
+        padding: 4px;
+      }
+      
+      .flex-item {
+        padding: 8px 10px 8px 10px;
+      }
+    </style>
 
   </head>
-  <body>
+  <body style="margin: auto 0 0 0; padding: 0; background-color: transparent">
 
-    <div class="column-layout" style="min-width: 200px; max-width: 600px">
-      <form id="form" class="flex-item">
+    <div class="column-layout" style="margin: 0; padding: 0">
+      <form id="form" class="flex-item" style="margin: 0">
         <table>
-          <tr>
-            <td class="flex-fixed">
-              <span class="icon-spacer" style="margin: 0" />
-            </td>
-            <td>
-              <label class="title">PWManager</label>
-            </td>
-            <td class="flex-fixed vert-auto">
-              <button type="button" id="settings" class="material-icons icon-button" style="padding: 0">settings</button>
-            </td>
-          </tr>
           <tr><td>
             <span id="master-wrapper" class="input-wrapper">
               <span class="icon-spacer">
@@ -65,27 +71,15 @@
             </span>
           </td></tr>
           <tr><td style="display: flex">
-            <span class="tooltip-container" style="position: relative; padding-right: 10px">
-              <button type="button" id="long" class="material-icons filled-icon-button" style="padding: 8px">text_increase</button>
-              <div class="tooltip" style="top: 60px; left: 17px">
-                Long&nbsp;Password
-              </div>
-            </span>
-            <button type="button" id="generate" class="filled-button"
-              style="flex-grow: 1">Generate & Copy</button>
-          </td></tr>
-          <tr id="copymsg" style="display: none"><td>
-            <label class="msg">Copied to clipboard!</label>
+            <button type="button" id="long" class="material-icons filled-icon-button" style="margin-right: 10px">text_increase</button>
+            <button type="button" id="generate" class="filled-button" style="flex-grow: 1">Generate</button>
           </td></tr>
         </table>
       </form>
     </div>
-
-    <input type="hidden" id="result" readonly>
-
-    <script src="../browser-polyfill.min.js"></script>
+    
     <script src="../pwm-core.js"></script>
-    <script src="genpage.js"></script>
+    <script src="pwm-content-inner.js"></script>
 
   </body>
 </html>

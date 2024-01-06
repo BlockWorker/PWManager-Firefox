@@ -8,20 +8,14 @@ const symbolwr = document.getElementById("symbols-wrapper");
 const symbolbox = document.getElementById("symbols");
 const longbtn = document.getElementById("long");
 const genbtn = document.getElementById("generate");
-const result = document.getElementById("result");
-const copymsg = document.getElementById("copymsg");
 
 var longpw = true;
 
 function genpageCallback(pw) {
-  result.type = "text";
-  result.value = pw;
-  result.select();
-  document.execCommand("copy");
-  result.value = "";
-  result.type = "hidden";
-  copymsg.style.display = "inherit";
-  setTimeout(() => { copymsg.style.display = "none"; }, 2000);
+  window.parent.postMessage(
+    {"type": "pwm-gen", "value": pw},
+    "*"
+  );
 }
 
 function process() {
@@ -37,9 +31,10 @@ function process() {
 function init() {
   symbolbox.value = DEFAULT_SYMBOLS;
   
-  loadSettings(function() {
-    sync(null);
-  });
+  window.parent.postMessage(
+    {"type": "pwm-loadinfo"},
+    "*"
+  );
 }
 
 document.getElementById("master-wrapper").addEventListener("click", function() {
@@ -73,10 +68,6 @@ symbolbox.addEventListener("input", function() {
     genbtn.classList.add("disabled");
   }
 });
-
-document.getElementById("settings").addEventListener("click", function() {
-  browser.runtime.openOptionsPage();
-})
 
 genbtn.addEventListener("click", process)
 
@@ -115,6 +106,20 @@ identbox.addEventListener("change", function() {
     } else {
       longbtn.classList.add("filled-button-inactive");
     }
+  }
+});
+
+window.addEventListener("message", function(event) {
+  if (event.source !== window.parent) return;
+  
+  const data = event.data;
+  if (!(data && "type" in data && data.type && typeof data.type === "string")) return;
+  
+  switch (data.type) {
+    case "pwm-loaded":
+      if (!("items" in data && typeof data.items === "object" && "sync" in data && typeof data.sync === "object")) break;
+      console.log(data);
+      break;
   }
 });
 

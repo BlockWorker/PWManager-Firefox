@@ -78,8 +78,8 @@ function genFromWindow() {
 function createWindow() {
   if (pwField == undefined) return;
   
-  windowRoot = document.createElement("div");
-  const form = document.createElement("form");
+  windowRoot = document.createElement("iframe");
+  /*const form = document.createElement("form");
   const table = document.createElement("table");
   const r1 = document.createElement("tr");
   const r2 = document.createElement("tr");
@@ -173,7 +173,14 @@ function createWindow() {
   
   form.appendChild(table);
   
-  windowRoot.appendChild(form);
+  windowRoot.appendChild(form);*/
+  
+  const url = browser.runtime.getURL("content/pwm-content.html");
+  
+  windowRoot.className = "pwm-iframe";
+  windowRoot.sandbox.add("allow-scripts");
+  
+  windowRoot.src = url;
   
   document.body.appendChild(windowRoot);
   
@@ -184,7 +191,7 @@ function createWindow() {
   
   document.body.addEventListener("mousedown", bodyClickWithWindow);
   
-  masterbox.focus();
+  //masterbox.focus();
 }
 
 function pwFocus(field) {
@@ -232,10 +239,32 @@ function initPwmContent() {
   browser.runtime.onMessage.addListener(onPwmCommand);
 }
 
+window.addEventListener("message", function(event) {
+  if (event.source !== windowRoot?.contentWindow) return;
+  
+  const data = event.data;
+  if (!(data && "type" in data && data.type && typeof data.type === "string")) return;
+  
+  switch(data.type) {
+    case "pwm-loadinfo":
+      loadSettings(function() {
+        sync(function(success) {
+          event.source.postMessage(
+            {"type": "pwm-loaded", "items": pwm_settingItems, "sync": pwm_syncSettings, "sync_success": success},
+            "*"
+          );
+        });
+      });
+      break;
+    case "pwm-gen":
+      if (!("value" in data && data.value && typeof data.value === "string")) break;
+      console.log(data.value);
+      break;
+  }
+});
+
 if (document.readyState === "loading") {
   document.addEventListener("DOMContentLoaded", initPwmContent);
 } else {
   initPwmContent();
 }
-
-
