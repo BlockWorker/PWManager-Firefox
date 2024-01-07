@@ -9,6 +9,7 @@
   --theme-hover-dark: #112;
   --theme-hover-mid: #338;
   --theme-hover-bright: #88f;
+  --theme-highlight: #66f;
   --inactive: #383838;
   --inactive-hover: #444;
   --error-dark: #822;
@@ -19,6 +20,29 @@
   --inline-icon: #aaa;
   --disabled-bg: #333;
   --disabled-fg: #555;
+}
+
+@font-face {
+  font-family: 'Material Icons';
+  font-style: normal;
+  font-weight: 400;
+  src: url('material-icons.woff2') format('woff2');
+}
+
+.material-icons {
+  font-family: 'Material Icons';
+  font-weight: normal;
+  font-style: normal;
+  font-size: 24px;
+  line-height: 1;
+  letter-spacing: normal;
+  text-transform: none;
+  display: inline-block;
+  white-space: nowrap;
+  word-wrap: normal;
+  direction: ltr;
+  -moz-font-feature-settings: 'liga';
+  -moz-osx-font-smoothing: grayscale;
 }
 
 html {
@@ -285,7 +309,11 @@ button.filled-button-inactive:hover, button.delete-button-inactive:hover {
   background-color: var(--inactive-hover);
 }
 
-.icon-button:hover, .inline-icon.highlight {
+.inline-icon.highlight, .icon-button.highlight {
+  color: var(--theme-highlight);
+}
+
+.icon-button:hover, .icon-button.highlight:hover {
   color: var(--theme-hover-bright);
 }
 
@@ -329,4 +357,9 @@ button.disabled, button.disabled:focus, button.disabled:active {
   visibility: visible;
   opacity: 1;
   transition-delay: 0
+}
+
+input.pseudo-password {
+  -webkit-text-security: disc;
+  font-size: 20px;
 }

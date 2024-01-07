@@ -1,6 +1,6 @@
 {
 
-  "manifest_version": 2,
+  "manifest_version": 3,
   "name": "PWManager",
   "version": "1.2.0",
 
@@ -16,7 +16,7 @@
   
   "permissions": [
     "storage",
-    "https://*/*"
+    "webRequest"
   ],
 
   "icons": {
@@ -34,7 +34,10 @@
   ],
   
   "web_accessible_resources": [
-    "content/pwm-content.html"
+    {
+      "resources": ["content/pwm-content.html", "icons/popup.png"],
+      "matches": ["https://*/*"]
+    }
   ],
   
   "background": {
@@ -49,8 +52,7 @@
     "open_in_tab": true
   },
   
-  "browser_action": {
-    "browser_style": true,
+  "action": {
     "default_icon": {
       "24": "icons/dark-24.png",
       "48": "icons/dark-48.png",

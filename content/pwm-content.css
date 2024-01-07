@@ -5,14 +5,14 @@ iframe.pwm-iframe {
   display: block;
   background: transparent;
   border: none;
-  width: 400px;
-  height: 330px;
+  width: 330px;
+  height: 222px;
   overflow: hidden;
 }
 
 div.pwm-popup {
   all: revert;
-  position: fixed;
+  position: absolute;
   display: block;
   box-sizing: border-box;
   padding: 2px;
@@ -20,102 +20,4 @@ div.pwm-popup {
   width: 26px;
   height: 32px;
   z-index: 9999;
-}
-
-div.pwm-window {
-  all: revert;
-  position: fixed;
-  display: block;
-  box-sizing: border-box;
-  padding: 2px;
-  border: 2px solid #336;
-  border-radius: 4px;
-  background: #222;
-  z-index: 9999;
-}
-
-form.pwm-window {
-  all: revert;
-  width: 100%;
-  height: 100%;
-  background: transparent;
-}
-
-table.pwm-window {
-  all: revert;
-  padding: 0;
-  margin: 0;
-}
-
-td.pwm-window {
-  all: revert;
-  padding-top: 2px;
-  padding-bottom: 2px;
-  text-align: left;
-}
-
-label.pwm-window {
-  all: revert;
-  font: 16px "Noto Sans", sans-serif;
-  display: inline-block;
-  width: 70px;
-  text-align: right;
-  color: #fff;
-  margin-right: 4px;
-}
-
-input.pwm-window {
-  all: revert;
-  font: 16px sans-serif;
-  color: #fff;
-  background-color: #111;
-
-  width: 200px;
-  box-sizing: border-box;
-
-  padding: 2px;  
-  border: 1px solid #336;
-  border-radius: 4px;
-  
-  outline: 2px solid transparent;
-  
-  transition: .3s background-color, .3s outline-color, .3s border-color;
-}
-
-input.pwm-window:hover {
-  background-color: #112;
-}
-
-input.pwm-window:focus:not([type=checkbox]) {
-  outline-color: #33f;
-  border-color: transparent;
-}
-
-button.pwm-window {
-  all: revert;
-  color: #fff;
-  background-color: #151515;
-  box-sizing: border-box;
-  width: 170px;
-  padding: 2px;  
-  border: 2px solid #336;
-  border-radius: 4px;
-  transition: .25s background-color;
-}
-
-button.pwm-window:hover {
-  background-color: #151525;
-}
-
-button.pwm-window:active {
-  background-color: #33f;
-}
-
-img.pwm-window {
-  all: revert;
-  position: absolute;
-  box-sizing: border-box;
-  margin: 4px;
-  margin-top: -1px;
-  padding: 0;
 }

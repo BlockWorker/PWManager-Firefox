@@ -25,6 +25,7 @@ const synccancelbtn = document.getElementById("sync-cancel-button");
 const syncsavebtn = document.getElementById("sync-save-button");
 const synctestingdisp = document.getElementById("sync-testing");
 
+//clear ident table
 function clearTable() {
   var node = templaterow.nextElementSibling;
   while (node && node != divider) {
@@ -34,7 +35,9 @@ function clearTable() {
   }
 }
 
+//add ident table row with given info - or null for new empty item
 function addRow(info) {
+  var putFocus = false;
   if (!info) {
     info = {
       "ident": "",
@@ -43,12 +46,14 @@ function addRow(info) {
       "longpw": true,
       "timestamp": new Date()
     };
+    putFocus = true; //new empty item: focus after creation
   }
   
-  var row = templaterow.cloneNode(true);
+  var row = templaterow.cloneNode(true); //clone from template row
   row.id = "";
-  row.style.display = "flex";
+  row.style.display = "flex"; //enable display
   
+  //get children
   var identwr = row.children[0].children[0];
   var identbox = identwr.children[1];
   var iterwr = row.children[1].children[0];
@@ -59,10 +64,12 @@ function addRow(info) {
   var longpwbtn = row.children[3].children[0];
   var deletebtn = row.children[5].children[0];
   
+  //focus inputs on wrapper click
   identwr.addEventListener("click", function() { identbox.focus(); });
   iterwr.addEventListener("click", function() { iterbox.focus(); });
   symbolswr.addEventListener("click", function() { symbolsbox.focus(); });
   
+  //validate inputs
   identbox.addEventListener("input", function() {
     if (identbox.value) identwr.classList.remove("input-error");
     else identwr.classList.add("input-error");
@@ -76,11 +83,13 @@ function addRow(info) {
     else symbolswr.classList.add("input-error");
   });
   
+  //reset to all symbols
   symbolsbtn.addEventListener("click", function() {
     symbolsbox.value = DEFAULT_SYMBOLS;
     symbolsbox.dispatchEvent(new Event("input"));
   });
   
+  //toggle long password and deletion
   longpwbtn.addEventListener("click", function() {
     if (longpwbtn.classList.contains("filled-button-inactive")) {
       longpwbtn.classList.remove("filled-button-inactive");
@@ -96,6 +105,7 @@ function addRow(info) {
     }
   });
   
+  //populate with given info values
   identbox.value = info.ident;
   identbox.dispatchEvent(new Event("input"));
   iterbox.value = info.iter;
@@ -108,9 +118,12 @@ function addRow(info) {
     longpwbtn.classList.add("filled-button-inactive");
   }
   
-  table.insertBefore(row, divider);
+  table.insertBefore(row, divider); //insert into table
+  
+  if (putFocus) identbox.focus();
 }
 
+//(re)populate table with setting items
 function populateTable() {
   clearTable();
   
@@ -119,13 +132,14 @@ function populateTable() {
   }
 }
 
+//interpret table entries as setting items
 function interpretTable() {
   res = {};
   
   var node = templaterow;
   while (node) {
     node = node.nextElementSibling;
-    if (node == divider) break;
+    if (node == divider) break; //end of table reached
     
     if (node.tagName != "TR") continue;
     
@@ -159,6 +173,7 @@ function interpretTable() {
   return res;
 }
 
+//readable description of the target date relative to now
 function timeSpanDescription(targetDate) {
   if (isNaN(targetDate) || targetDate.getUTCFullYear() < 2000) return "Never";
   
@@ -186,6 +201,7 @@ function timeSpanDescription(targetDate) {
   else return "In " + ret;
 }
 
+//update sync status display
 function updateSyncStatus() {
   if (!syncValid()) {
     syncstatusdisp.classList.remove("errormsg");
@@ -216,6 +232,7 @@ function updateSyncStatus() {
   }
 }
 
+//show sync control (default view)
 function showSyncControl() {
   syncsettings.style.display = "none";
   syncctl.style.display = "flex";
@@ -235,10 +252,12 @@ function showSyncControl() {
   synceditbtn.classList.remove("disabled");
 }
 
+//check if sync settings input values are valid
 function syncSettingsEntriesValid() {
   return synchostbox.value && syncportbox.value && synctokenbox.value && parseInt(syncportbox.value) > 0
 }
 
+//show sync settings (edit view)
 function showSyncSettings() {
   syncctl.style.display = "none";
   syncsettings.style.display = "flex";
@@ -268,6 +287,7 @@ function showSyncSettings() {
   }
 }
 
+//perform sync with corresponding UI updates
 function performSync() {
   if (!syncValid() || pwm_syncInProgress) return;
   
@@ -279,6 +299,7 @@ function performSync() {
   updateSyncStatus();
 }
 
+//init page after load
 function init() {
   clearbtn.classList.remove("disabled");
   addbtn.classList.remove("disabled");
@@ -294,6 +315,7 @@ function init() {
   });
 }
 
+//delete all settings
 clearbtn.addEventListener("click", function() {
   if (!confirm("All settings will be deleted, including sync settings. Are you sure?")) return;
   
@@ -305,17 +327,20 @@ clearbtn.addEventListener("click", function() {
   });
 });
 
+//new ident row/item
 addbtn.addEventListener("click", function() {
   addRow(null);
 });
 
+//save idents
 savebtn.addEventListener("click", function() {
-  var interpreted = interpretTable();
+  var interpreted = interpretTable(); //get table interpreted as settings
   if (typeof interpreted === "string") {
     alert("Error: " + interpreted);
     return;
   }
   
+  //reset timestamps of unchanged settings
   var items = Object.values(interpreted);
   for (var i of items) {
     if (i.ident in pwm_settingItems) {
@@ -326,6 +351,7 @@ savebtn.addEventListener("click", function() {
     }
   }
   
+  //save and sync new settings
   browser.storage.local.set(
     {"pwm-settings": JSON.stringify(items)}
   ).then(function() {
@@ -336,10 +362,13 @@ savebtn.addEventListener("click", function() {
   });
 });
 
+//switch to sync settings
 synceditbtn.addEventListener("click", showSyncSettings);
 
+//sync button
 syncbtn.addEventListener("click", performSync);
 
+//validate sync inputs
 synchostbox.addEventListener("input", function() {
   if (synchostbox.value) synchostwr.classList.remove("input-error");
   else synchostwr.classList.add("input-error");
@@ -364,6 +393,7 @@ synctokenbox.addEventListener("input", function() {
   else syncsavebtn.classList.add("disabled");
 });
 
+//delete sync settings
 syncdeletebtn.addEventListener("click", function() {
   if (!confirm("Sync settings will be deleted, disabling sync. Identifier settings will remain intact. Are you sure?")) return;
   
@@ -374,8 +404,10 @@ syncdeletebtn.addEventListener("click", function() {
   });
 });
 
+//return to sync control (cancel edit)
 synccancelbtn.addEventListener("click", showSyncControl);
 
+//save sync settings - tested first
 syncsavebtn.addEventListener("click", function() {
   if (!syncSettingsEntriesValid() || synctestingdisp.innerText != "") return;
   
@@ -416,6 +448,7 @@ syncsavebtn.addEventListener("click", function() {
   });
 });
 
+//initial loading trigger
 if (document.readyState === "loading") {
   document.addEventListener("DOMContentLoaded", init);
 } else {

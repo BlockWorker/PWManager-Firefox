@@ -16,6 +16,7 @@ String.prototype.insert = function(index, string) {
   return string + this;
 };
 
+//password generation function
 function genPass(master, ident, iter, longpw, symbols, callback) {
   const base = master + ident + iter;
   cs.digest("SHA-384", new TextEncoder().encode(base)).then(rawhash => {
@@ -51,6 +52,7 @@ function genPass(master, ident, iter, longpw, symbols, callback) {
   });
 }
 
+//reviver function for date objects from json
 function jsonReviver(key, value) {
   if (key.includes("time") || key.includes("last")) {
     return new Date(Date.parse(value));
@@ -58,6 +60,7 @@ function jsonReviver(key, value) {
   return value;
 }
 
+//check whether a sync response object is valid in structure
 function syncResponseValid(syncRes) {
   return syncRes && "uuid" in syncRes && "token" in syncRes && "sync_time" in syncRes &&
           "changed_idents" in syncRes && "deleted_idents" in syncRes && syncRes.uuid &&
@@ -67,6 +70,7 @@ function syncResponseValid(syncRes) {
           Array.isArray(syncRes.deleted_idents);
 }
 
+//check whether an ident settings item is valid in structure
 function identItemValid(item) {
   return item && "ident" in item && "iter" in item && "symbols" in item &&
           "longpw" in item && "timestamp" in item && item.ident &&
@@ -76,6 +80,7 @@ function identItemValid(item) {
           item.timestamp instanceof Date && !isNaN(item.timestamp);
 }
 
+//check whether a sync settings object is valid in structure
 function syncSettingsValid(settings) {
   return settings && "host" in settings && "port" in settings && "token" in settings &&
           "last_sync" in settings && typeof settings.host === "string" &&
@@ -83,11 +88,12 @@ function syncSettingsValid(settings) {
           settings.last_sync && settings.last_sync instanceof Date && !isNaN(settings.last_sync);
 }
 
+//load settings (idents + sync) from storage
 function loadSettings(cb) {
   pwm_settingItems = {};
   pwm_syncSettings = { "host": "", "port": 0, "token": "", "last_sync": new Date(0) };
   
-  try {
+  try { //idents
     browser.storage.local.get({"pwm-settings": "[]"}).then(stored => {
       var list = JSON.parse(stored["pwm-settings"], jsonReviver);
       
@@ -106,7 +112,7 @@ function loadSettings(cb) {
         console.error(list);
       }
       
-      try {
+      try { //sync
         browser.storage.local.get({"pwm-sync": ""}).then(sync_stored => {
           if (sync_stored["pwm-sync"]) {
             var syncSet = JSON.parse(sync_stored["pwm-sync"], jsonReviver);
@@ -134,11 +140,13 @@ function loadSettings(cb) {
   
 }
 
+//check whether current sync settings are valid for sync operations
 function syncValid() {
   return syncSettingsValid(pwm_syncSettings) && pwm_syncSettings.host &&
           pwm_syncSettings.port > 0 && pwm_syncSettings.token;
 }
 
+//test sync server connection with the given host and port
 function testSync(host, port, resultCb) {
   if (!host || port < 1) {
     resultCb(false);
@@ -149,12 +157,12 @@ function testSync(host, port, resultCb) {
     var req = new XMLHttpRequest();
     
     req.addEventListener("loadend", function() {
-      if (req.status != 200) {
+      if (req.status != 200) { //check for OK status
         resultCb(false);
         return;
       }
       
-      try {
+      try { //read response JSON and check for expected version
         var res = JSON.parse(req.responseText);
         
         if (res && "pwm_sync_version" in res) {
@@ -169,7 +177,7 @@ function testSync(host, port, resultCb) {
     });
     
     req.open("GET", `https://${host}:${port}/ping`);
-    req.timeout = 5000;
+    req.timeout = 5000; //timeout to catch unavailable servers etc.
     req.send();
   } catch (e) {
     console.error(e);
@@ -177,6 +185,7 @@ function testSync(host, port, resultCb) {
   }
 }
 
+//perform sync with configured server
 function sync(resultCb) {
   if (pwm_syncInProgress || !syncValid()) {
     if (resultCb) resultCb(false);
@@ -185,7 +194,7 @@ function sync(resultCb) {
   
   pwm_syncInProgress = true;
   
-  try {
+  try { //start by testing server connection
     testSync(pwm_syncSettings.host, pwm_syncSettings.port, function(testRes) {
       if (!testRes) {
         pwm_lastSyncSucceeded = false;
@@ -194,7 +203,7 @@ function sync(resultCb) {
         return;
       }
       
-      try {
+      try { //send sync request with current settings
         var request = {
           "token": pwm_syncSettings.token,
           "last_sync": pwm_syncSettings.last_sync,
@@ -206,7 +215,7 @@ function sync(resultCb) {
         var syncReq = new XMLHttpRequest();
         
         syncReq.addEventListener("loadend", function() {
-          if (syncReq.status != 200) {
+          if (syncReq.status != 200) { //sync request failed?
             console.error(`Sync fail: Response code ${syncReq.status} type ${syncReq.responseType}`);
             pwm_lastSyncSucceeded = false;
             pwm_syncInProgress = false;
@@ -217,14 +226,14 @@ function sync(resultCb) {
           try {
             var syncRes = JSON.parse(syncReq.responseText, jsonReviver);
             
-            if (!syncResponseValid(syncRes)) {
+            if (!syncResponseValid(syncRes)) { //response valid?
               pwm_lastSyncSucceeded = false;
               pwm_syncInProgress = false;
               if (resultCb) resultCb(false);
               return;
             }
             
-            var confirmation = {
+            var confirmation = { //create and send sync confirmation
               "uuid": syncRes.uuid,
               "token": syncRes.token,
               "sync_time": syncRes.sync_time
@@ -232,8 +241,8 @@ function sync(resultCb) {
             
             var confReq = new XMLHttpRequest();
             
-            confReq.addEventListener("loadend", function() {
-              if (confReq.status != 200) {
+            confReq.addEventListener("loadend", function() { 
+              if (confReq.status != 200) { //confirmation failed?
                 console.error(`Sync confirm fail: Response code ${confReq.status}`);
                 pwm_lastSyncSucceeded = false;
                 pwm_syncInProgress = false;
@@ -241,7 +250,7 @@ function sync(resultCb) {
                 return;
               }
               
-              try {
+              try { //parse sync response and apply changes
                 for (let ident of syncRes.deleted_idents) {
                   if (!(ident && typeof ident === "string")) {
                     console.error("Sync received invalid ident deletion");
@@ -265,7 +274,7 @@ function sync(resultCb) {
                 browser.storage.local.set(
                   {"pwm-settings": JSON.stringify(Object.values(pwm_settingItems))}
                 ).then(function() {
-                  pwm_syncSettings.last_sync = syncRes.sync_time;
+                  pwm_syncSettings.last_sync = syncRes.sync_time; //set last sync time
                   
                   browser.storage.local.set(
                     {"pwm-sync": JSON.stringify(pwm_syncSettings)}
@@ -311,13 +320,3 @@ function sync(resultCb) {
     if (resultCb) resultCb(false);
   }
 }
-
-/*
-function getIdentConfig(ident, callback) { //callback with args iter, symbols
-  browser.storage.sync.get(ident).then(obj => {
-    const result = obj[ident];
-    if (result == undefined) callback(0, defaultSymbols);
-    else callback(result[0], result[1]);
-  });
-}
-*/

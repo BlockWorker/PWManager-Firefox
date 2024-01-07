@@ -1,10 +1,9 @@
 <!DOCTYPE html>
-<html style="width: 400px; height: 330px; overflow: hidden; background-color: transparent">
+<html style="width: 330px; height: 222px; overflow: hidden; background-color: transparent">
   <head>
 
     <meta charset="utf-8"/>
     <link rel="stylesheet" href="../pwm.css">
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <style>
       td {
         margin-top: 2px;
@@ -20,7 +19,7 @@
       }
       
       .flex-item {
-        padding: 8px 10px 8px 10px;
+        padding: 6px 8px 6px 8px;
       }
     </style>
 
@@ -35,7 +34,7 @@
               <span class="icon-spacer">
                 <span class="material-icons inline-icon">password</span>
               </span>
-              <input type="password" id="master" name="pwm_master" class="pwm-ignore" placeholder="Master Password">
+              <input type="text" id="master" name="pwm_master" placeholder="Master Password">
             </span>
           </td></tr>
           <tr><td>
@@ -44,9 +43,14 @@
                 <span id="ident-icon" class="material-icons inline-icon">link</span>
               </span>
               <input type="text" id="ident" name="pwm_ident" placeholder="Identifier">
+              <span class="icon-spacer">
+                <span class="inline-icon" style="padding-top: 4px; pointer-events: auto">
+                  <button type="button" id="ident-switch" class="material-icons icon-button">first_page</button>
+                </span>
+              </span>
             </span>
           </td></tr>
-          <tr><td>
+          <tr id="iter-row" style="display: none"><td>
             <span id="iter-wrapper" class="input-wrapper">
               <span class="icon-spacer">
                 <span class="material-icons inline-icon">tag</span>
@@ -54,24 +58,23 @@
               <input type="number" id="iter" name="pwm_iter" value="0" min="0" placeholder="Iteration">
             </span>
           </td></tr>
-          <tr><td>
+          <tr id="symbols-row" style="display: none"><td>
             <span id="symbols-wrapper" class="input-wrapper">
               <span class="icon-spacer">
                 <span class="material-icons inline-icon">emoji_symbols</span>
               </span>
               <input type="text" id="symbols" name="pwm_symbols" placeholder="Symbols">
               <span class="icon-spacer">
-                <span class="inline-icon tooltip-container" style="padding-top: 4px; pointer-events: auto">
+                <span class="inline-icon" style="padding-top: 4px; pointer-events: auto">
                   <button type="button" id="allsymbols" class="material-icons icon-button">all_inclusive</button>
-                  <div class="tooltip" style="top: 50px; left: 15px">
-                    All&nbsp;Symbols
-                  </div>
                 </span>
               </span>
             </span>
           </td></tr>
           <tr><td style="display: flex">
+            <button type="button" id="expand" class="material-icons icon-button" style="margin-right: 10px">expand_more</button>
             <button type="button" id="long" class="material-icons filled-icon-button" style="margin-right: 10px">text_increase</button>
+            <button type="button" id="save" class="material-icons filled-icon-button filled-button-inactive" style="margin-right: 10px; display: none">save</button>
             <button type="button" id="generate" class="filled-button" style="flex-grow: 1">Generate</button>
           </td></tr>
         </table>

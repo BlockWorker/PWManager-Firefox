@@ -1,15 +1,18 @@
 var pwField = undefined;
 var popupRoot = undefined;
-var windowRoot = undefined;
-var url = undefined;
+var windowFrame = undefined;
+var identShort = "";
+var identLong = "";
 var sub = false;
 var popupClicked = false;
 
+//remove prompt popup icon
 function removePopup() {
   if (popupRoot != undefined) popupRoot.remove();
   popupRoot = undefined;
 }
 
+//create prompt popup icon above password field
 function createPopup() {
   popupRoot = document.createElement("div");
   
@@ -20,7 +23,7 @@ function createPopup() {
     popupClicked = true;
   });
   
-  popupRoot.addEventListener("click", function() {
+  popupRoot.addEventListener("click", function() { //on click: remove popup icon, show generation window
     removePopup();
     createWindow();
     popupClicked = false;
@@ -28,172 +31,66 @@ function createPopup() {
   
   document.body.appendChild(popupRoot);
   
+  //position icon above the password field on the right side
   const pwRect = pwField.getBoundingClientRect();
   const popRect = popupRoot.getBoundingClientRect();
-  popupRoot.style.left = Math.round(pwRect.right - popRect.width).toString() + "px";
-  popupRoot.style.top = Math.round(pwRect.top - popRect.height).toString() + "px";
+  const bodyRect = document.body.getBoundingClientRect();
+  popupRoot.style.left = Math.round(pwRect.right - popRect.width - bodyRect.left).toString() + "px";
+  popupRoot.style.top = Math.round(pwRect.top - popRect.height - bodyRect.top).toString() + "px";
 }
 
-function getIdent() {
-  const urlRegex = /(?:(?:[A-Za-z0-9-]+\.)+)?([A-Za-z0-9-]+\.[A-Za-z0-9-]+)/;
-  const match = url.match(urlRegex);
-  if (match == null) return "";
-  return sub ? match[0] : match[1];
-}
-
+//remove generation window
 function removeWindow() {
-  if (windowRoot != undefined) windowRoot.remove();
-  windowRoot = undefined;
+  if (windowFrame != undefined) windowFrame.remove();
+  windowFrame = undefined;
   pwField = undefined;
   document.body.removeEventListener("mousedown", bodyClickWithWindow);
 }
 
+//remove generation window and popup icon when clicking away
 function bodyClickWithWindow(e) {
-  if (!e.target.matches(".pwm-popup, .pwm-window")) removeWindow();
+  if (!e.target.matches(".pwm-popup, .pwm-iframe")) removeWindow();
 }
 
-function genFromWindow() {
-  if (windowRoot == undefined || pwField == undefined) return;
-  
-  const fd = new FormData(windowRoot.children[0]);
-  const master = fd.get('pwm_master');
-  const ident = fd.get('pwm_ident');
-  const longpw = fd.has('pwm_long');
-  
-  getIdentConfig(ident, (iter, symbols) => {
-    genPass(master, ident, iter, longpw, symbols, (pw) => {
-      pwField.focus();
-      pwField.value = pw;
-      pwField.dispatchEvent(new Event("input"));
-      //pwField.dispatchEvent(new KeyboardEvent("keyup", {key: "a"}));
-      pwField.dispatchEvent(new Event("change"));
-      
-      const oldpwfield = pwField;
-      removeWindow();
-      oldpwfield.focus();
-    });
-  });
-}
-
+//create generation window
 function createWindow() {
   if (pwField == undefined) return;
   
-  windowRoot = document.createElement("iframe");
-  /*const form = document.createElement("form");
-  const table = document.createElement("table");
-  const r1 = document.createElement("tr");
-  const r2 = document.createElement("tr");
-  const r3 = document.createElement("tr");
-  const r1c1 = document.createElement("td");
-  const r1c2 = document.createElement("td");
-  const r2c1 = document.createElement("td");
-  const r2c2 = document.createElement("td");
-  const r3c1 = document.createElement("td");
-  const r3c2 = document.createElement("td");
-  const masterlabel = document.createElement("label");
-  const identlabel = document.createElement("label");
-  const longlabel = document.createElement("label");
-  const masterbox = document.createElement("input");
-  const identbox = document.createElement("input");
-  const longbox = document.createElement("input");
-  const button = document.createElement("button");
-  const image = document.createElement("img");
+  //get url and extract idents
+  const urlRegex = /(?:(?:[A-Za-z0-9-]+\.)+)?([A-Za-z0-9-]+\.[A-Za-z0-9-]+)/;
+  const match = window.location.href.match(urlRegex);
+  if (match) {
+    identShort = match[1];
+    identLong = match[0];
+  } else {
+    identShort = "";
+    identLong = "";
+  }
   
-  windowRoot.className = "pwm-window";
-  form.className = "pwm-window";
-  table.className = "pwm-window";
-  r1.className = "pwm-window";
-  r2.className = "pwm-window";
-  r3.className = "pwm-window";
-  r1c1.className = "pwm-window";
-  r1c2.className = "pwm-window";
-  r2c1.className = "pwm-window";
-  r2c2.className = "pwm-window";
-  r3c1.className = "pwm-window";
-  r3c2.className = "pwm-window";
-  masterlabel.className = "pwm-window";
-  identlabel.className = "pwm-window";
-  longlabel.className = "pwm-window";
-  masterbox.className = "pwm-window pwm-ignore";
-  identbox.className = "pwm-window";
-  longbox.className = "pwm-window";
-  button.className = "pwm-window";
-  image.className = "pwm-window";
+  //create iframe with window content
+  windowFrame = document.createElement("iframe");
   
-  masterlabel.htmlFor = "pwm-master";
-  masterlabel.innerText = browser.i18n.getMessage("master") + ":";
-  identlabel.htmlFor = "pwm-ident";
-  identlabel.innerText = browser.i18n.getMessage("ident") + ":";
-  longlabel.htmlFor = "pwm-long";
-  longlabel.innerText = browser.i18n.getMessage("long");
-  longlabel.style.width = "40px";
-  longlabel.style.textAlign = "left";
+  const windowUrl = browser.runtime.getURL("content/pwm-content.html");
   
-  masterbox.type = "password";
-  masterbox.id = "pwm-master";
-  masterbox.name = "pwm_master";
-  identbox.type = "text";
-  identbox.id = "pwm-ident";
-  identbox.name = "pwm_ident";
-  longbox.type = "checkbox";
-  longbox.id = "pwm-long";
-  longbox.name = "pwm_long";
-  longbox.checked = true;
-  longbox.style.width = "15px";
+  windowFrame.className = "pwm-iframe";
+  windowFrame.sandbox.add("allow-scripts"); //requires inner script for UI
+  windowFrame.sandbox.add("allow-same-origin"); //requires same-origin access for icon font
   
-  button.type = "button";
-  button.innerText = browser.i18n.getMessage("generate");
+  windowFrame.src = windowUrl;
   
-  image.src = browser.runtime.getURL("icons/dark-24.png");
+  document.body.appendChild(windowFrame);
   
-  button.addEventListener("click", genFromWindow);
-  url = window.location.href;
-  sub = false;
-  identbox.value = getIdent();
-  
-  r1c1.appendChild(masterlabel);
-  r1c2.appendChild(masterbox);
-  r2c1.appendChild(identlabel);
-  r2c2.appendChild(identbox);
-  r3c1.appendChild(longbox);
-  r3c1.appendChild(longlabel);
-  r3c2.appendChild(button);
-  r3c2.appendChild(image);
-  
-  r1.appendChild(r1c1);
-  r1.appendChild(r1c2);
-  r2.appendChild(r2c1);
-  r2.appendChild(r2c2);
-  r3.appendChild(r3c1);
-  r3.appendChild(r3c2);
-  
-  table.appendChild(r1);
-  table.appendChild(r2);
-  table.appendChild(r3);
-  
-  form.appendChild(table);
-  
-  windowRoot.appendChild(form);*/
-  
-  const url = browser.runtime.getURL("content/pwm-content.html");
-  
-  windowRoot.className = "pwm-iframe";
-  windowRoot.sandbox.add("allow-scripts");
-  
-  windowRoot.src = url;
-  
-  document.body.appendChild(windowRoot);
-  
+  //position window above the password field on the right side
   const pwRect = pwField.getBoundingClientRect();
-  const winRect = windowRoot.getBoundingClientRect();
-  windowRoot.style.left = Math.round(pwRect.right - winRect.width).toString() + "px";
-  windowRoot.style.top = Math.round(pwRect.top - winRect.height).toString() + "px";
+  const winRect = windowFrame.getBoundingClientRect();
+  const bodyRect = document.body.getBoundingClientRect();
+  windowFrame.style.left = Math.round(pwRect.right - winRect.width - bodyRect.left).toString() + "px";
+  windowFrame.style.top = Math.round(pwRect.top - winRect.height - bodyRect.top).toString() + "px";
   
-  document.body.addEventListener("mousedown", bodyClickWithWindow);
-  
-  //masterbox.focus();
+  document.body.addEventListener("mousedown", bodyClickWithWindow); //handle "click-away"
 }
 
+//called when a password field is focused
 function pwFocus(field) {
   removeWindow();
   removePopup();
@@ -201,68 +98,134 @@ function pwFocus(field) {
   createPopup();
 }
 
+//called when password field loses focus
 function pwBlur(field) {
   removePopup();
   pwField = undefined;
 }
 
+//hanlde incoming command from extension (i.e., keyboard shortcut)
 function onPwmCommand(name) {
-  if (popupRoot != undefined && name == "pwm-main") {
+  if (popupRoot && name === "pwm-main") { //open generation window
     removePopup();
     createWindow();
-  } else if (windowRoot != undefined) {
-    const identbox = windowRoot.children[0].children[0].children[1].children[1].children[0];
-    const longbox = windowRoot.children[0].children[0].children[2].children[0].children[0];
-    
-    if (name == "pwm-main") {
-      genFromWindow();
-    } else if (name == "pwm-custom") {
-      identbox.select();
-    } else if (name == "pwm-subdomain") {
-      sub = !sub;
-      identbox.value = getIdent();
-    } else if (name == "pwm-length") {
-      longbox.checked = !longbox.checked;
-    }
+  } else if (windowFrame && windowFrame.contentWindow && name && typeof name === "string") {
+    //if generation window already present: forward command to window inner script
+    windowFrame.contentWindow.postMessage(
+      {"type": "pwm-command", "name": name},
+      "*"
+    );
   }
 }
 
+//init content script after page load
 function initPwmContent() {
+  //listen for focus events to see if password field focused/unfocused
   document.body.addEventListener("focusin", (e) => {
     if (e.target.tagName.toLowerCase() != "input" || e.target.type.toLowerCase() != "password" || e.target.classList.contains("pwm-ignore")) return;
     pwFocus(e.target);
   });
   document.body.addEventListener("focusout", (e) => {
-    if (e.target.tagName.toLowerCase() != "input" || e.target.type.toLowerCase() != "password" || e.target.classList.contains("pwm-ignore") || windowRoot != undefined || popupClicked) return;
+    if (e.target.tagName.toLowerCase() != "input" || e.target.type.toLowerCase() != "password" || e.target.classList.contains("pwm-ignore") || windowFrame != undefined || popupClicked) return;
     pwBlur(e.target);
   });
+  //register command listener
   browser.runtime.onMessage.addListener(onPwmCommand);
 }
 
+//check if saved item message has a valid structure
+function savedataMsgValid(item) {
+  return item && "ident" in item && "iter" in item && "symbols" in item &&
+          "longpw" in item && item.ident && typeof item.ident === "string" &&
+          typeof item.iter === "number" && item.iter >= 0 && item.symbols &&
+          typeof item.symbols === "string" && typeof item.longpw === "boolean";
+}
+
+//handle incoming messages from generation window inner script
 window.addEventListener("message", function(event) {
-  if (event.source !== windowRoot?.contentWindow) return;
+  if (event.source !== windowFrame?.contentWindow) return;
   
   const data = event.data;
+  //must have "type" to describe type of message
   if (!(data && "type" in data && data.type && typeof data.type === "string")) return;
   
   switch(data.type) {
-    case "pwm-loadinfo":
-      loadSettings(function() {
+    case "pwm-loadinfo": //generation window loaded, requesting settings
+      loadSettings(function() { //load settings, sync, send results to generation window
+        event.source.postMessage(
+          {
+            "type": "pwm-loaded",
+            "items": pwm_settingItems,
+            "shortident": identShort,
+            "longident": identLong
+          },
+          "*"
+        );
         sync(function(success) {
-          event.source.postMessage(
-            {"type": "pwm-loaded", "items": pwm_settingItems, "sync": pwm_syncSettings, "sync_success": success},
-            "*"
-          );
+          if (success) {
+            event.source.postMessage(
+              {
+                "type": "pwm-synced",
+                "items": pwm_settingItems
+              },
+              "*"
+            );
+          }
         });
       });
       break;
-    case "pwm-gen":
-      if (!("value" in data && data.value && typeof data.value === "string")) break;
-      console.log(data.value);
+    case "pwm-gen": //password generated, optionally with settings to be saved
+      if (!("value" in data && data.value && typeof data.value === "string" && "savedata" in data && typeof data.savedata === "object")) break;
+      
+      //insert password into field, with events to (hopefully) trigger input validation on the website
+      pwField.focus();
+      pwField.value = data.value;
+      pwField.dispatchEvent(new InputEvent(
+        "input",
+        {"inputType": "insertReplacementText", "data": data.value}
+      ));
+      pwField.dispatchEvent(new Event("change"));
+      
+      const oldpwfield = pwField;
+      removeWindow(); //remove generation window
+      oldpwfield.focus();
+      
+      if (data.savedata) { //settings need to be saved
+        let sd = data.savedata;
+        
+        if (!savedataMsgValid(sd)) break; //check validity
+        
+        let saveItem = { //create settings item
+          "ident": sd.ident,
+          "iter": sd.iter,
+          "symbols": sd.symbols,
+          "longpw": sd.longpw,
+          "timestamp": new Date()
+        };
+        
+        if (identItemValid(saveItem)) { //validate and check for duplicate, then insert, save, and sync
+          let ident = saveItem.ident;
+          
+          if (ident in pwm_settingItems) {
+            let existing = pwm_settingItems[ident];
+            if (saveItem.iter === existing.iter && saveItem.symbols === existing.symbols && saveItem.longpw === existing.longpw) break;
+          }
+          
+          pwm_settingItems[ident] = saveItem;
+          
+          browser.storage.local.set(
+            {"pwm-settings": JSON.stringify(Object.values(pwm_settingItems))}
+          ).then(function() {
+            sync(null);
+          });
+        }
+      }
+      
       break;
   }
 });
 
+//initial loading trigger
 if (document.readyState === "loading") {
   document.addEventListener("DOMContentLoaded", initPwmContent);
 } else {
