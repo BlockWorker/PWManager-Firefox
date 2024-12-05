@@ -1,5 +1,6 @@
 var pwField = undefined;
 var popupRoot = undefined;
+var windowRoot = undefined;
 var windowFrame = undefined;
 var identShort = "";
 var identLong = "";
@@ -15,33 +16,41 @@ function removePopup() {
 //create prompt popup icon above password field
 function createPopup() {
   popupRoot = document.createElement("div");
+  popupRoot.popover = "manual";
+  popupRoot.className = "pwm-popover";
   
-  popupRoot.className = "pwm-popup";
-  popupRoot.style.backgroundImage = "url(" + browser.runtime.getURL("icons/popup.png") + ")";
+  popupContent = document.createElement("div");
   
-  popupRoot.addEventListener("mousedown", function() {
+  popupContent.className = "pwm-popup";
+  popupContent.style.backgroundImage = "url(" + browser.runtime.getURL("icons/popup.png") + ")";
+  
+  popupContent.addEventListener("mousedown", function() {
     popupClicked = true;
   });
   
-  popupRoot.addEventListener("click", function() { //on click: remove popup icon, show generation window
+  popupContent.addEventListener("click", function() { //on click: remove popup icon, show generation window
     removePopup();
     createWindow();
     popupClicked = false;
   });
   
-  document.body.appendChild(popupRoot);
+  popupRoot.appendChild(popupContent);
+  
+  pwField.parentElement.appendChild(popupRoot);
+  
+  popupRoot.showPopover();
   
   //position icon above the password field on the right side
   const pwRect = pwField.getBoundingClientRect();
   const popRect = popupRoot.getBoundingClientRect();
-  const bodyRect = document.body.getBoundingClientRect();
-  popupRoot.style.left = Math.round(pwRect.right - popRect.width - bodyRect.left).toString() + "px";
-  popupRoot.style.top = Math.round(pwRect.top - popRect.height - bodyRect.top).toString() + "px";
+  popupRoot.style.left = Math.round(pwRect.right - popRect.width).toString() + "px";
+  popupRoot.style.top = Math.round(pwRect.top - popRect.height).toString() + "px";
 }
 
 //remove generation window
 function removeWindow() {
-  if (windowFrame != undefined) windowFrame.remove();
+  if (windowRoot != undefined) windowRoot.remove();
+  windowRoot = undefined;
   windowFrame = undefined;
   pwField = undefined;
   document.body.removeEventListener("mousedown", bodyClickWithWindow);
@@ -49,7 +58,7 @@ function removeWindow() {
 
 //remove generation window and popup icon when clicking away
 function bodyClickWithWindow(e) {
-  if (!e.target.matches(".pwm-popup, .pwm-iframe")) removeWindow();
+  if (!e.target.matches(".pwm-popup, .pwm-iframe, .pwm-popover")) removeWindow();
 }
 
 //create generation window
@@ -67,6 +76,11 @@ function createWindow() {
     identLong = "";
   }
   
+  //create surrounding popover
+  windowRoot = document.createElement("div");
+  windowRoot.popover = "manual";
+  windowRoot.className = "pwm-popover";
+  
   //create iframe with window content
   windowFrame = document.createElement("iframe");
   
@@ -78,14 +92,17 @@ function createWindow() {
   
   windowFrame.src = windowUrl;
   
-  document.body.appendChild(windowFrame);
+  windowRoot.appendChild(windowFrame);
+  
+  pwField.parentElement.appendChild(windowRoot);
+  
+  windowRoot.showPopover();
   
   //position window above the password field on the right side
   const pwRect = pwField.getBoundingClientRect();
-  const winRect = windowFrame.getBoundingClientRect();
-  const bodyRect = document.body.getBoundingClientRect();
-  windowFrame.style.left = Math.round(pwRect.right - winRect.width - bodyRect.left).toString() + "px";
-  windowFrame.style.top = Math.round(pwRect.top - winRect.height - bodyRect.top).toString() + "px";
+  const winRect = windowRoot.getBoundingClientRect();
+  windowRoot.style.left = Math.round(pwRect.right - winRect.width).toString() + "px";
+  windowRoot.style.top = Math.round(pwRect.top - winRect.height).toString() + "px";
   
   document.body.addEventListener("mousedown", bodyClickWithWindow); //handle "click-away"
 }
@@ -178,13 +195,12 @@ window.addEventListener("message", function(event) {
       if (!("value" in data && data.value && typeof data.value === "string" && "savedata" in data && typeof data.savedata === "object")) break;
       
       //insert password into field, with events to (hopefully) trigger input validation on the website
-      pwField.focus();
-      pwField.value = data.value;
-      pwField.dispatchEvent(new InputEvent(
-        "input",
-        {"inputType": "insertReplacementText", "data": data.value}
-      ));
-      pwField.dispatchEvent(new Event("change"));
+      pwField.select();
+      if (!document.execCommand("insertText", false, data.value)) {
+        console.log("falling back to value set");
+        pwField.value = data.value;
+      }
+      pwField.dispatchEvent(new Event("change", {bubbles: true}));
       
       const oldpwfield = pwField;
       removeWindow(); //remove generation window
